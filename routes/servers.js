@@ -17,8 +17,8 @@ var config = {
 };
 
 var keysPath = process.cwd();
-var privateKEY = fs.readFileSync('./../server/keys/private.key', 'utf8');
-var publicKEY = fs.readFileSync('./../server/keys/public.key', 'utf8');
+var privateKEY = fs.readFileSync('./keys/private.key', 'utf8');
+var publicKEY = fs.readFileSync('./keys/public.key', 'utf8');
 
 const passSalt = 'Entre_Braga_E_Nova_Iorque';
 const jwtExpirySeconds = 600;
