@@ -32,7 +32,7 @@ getUserInfoDB = function(req, callback) {
         console.log("INSIDE getUserInfo");
         try {
         con.connect(function(err) {
-        let result = con.query('SELECT CLIENT_ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ITERATIONS, ROLE FROM users where EMAIL = ?', [req.body.username], function(err, rows) {
+        let result = con.query('SELECT PLAYER_ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ITERATIONS, ROLE FROM users where EMAIL = ?', [req.body.username], function(err, rows) {
                 if (err) {
                     throw err;
                 } else
@@ -78,7 +78,7 @@ userAuthenticate =  async function (req, callback) {
 
         user_authentication = {
             user : {
-                player_id   : user[0].CLIENT_ID,
+                player_id   : user[0].PLAYER_ID,
                 role        : user_role,
                 token       : token
             },
@@ -93,7 +93,7 @@ userAuthenticate =  async function (req, callback) {
 
         user_authentication = {
             user : {
-                player_id   : user[0].CLIENT_ID,
+                player_id   : user[0].PLAYER_ID,
                 role        : user_role,
                 token       : token
             },
@@ -170,7 +170,7 @@ fetchAllVehicles = function(data, callback) {
         callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
         callback.end(JSON.stringify(rows));
         callback = rows;
-        console.log("GET ALL CLIENTS");   
+        console.log("GET ALL PLAYERS");   
 
     });
 
