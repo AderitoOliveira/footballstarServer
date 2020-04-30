@@ -80,6 +80,8 @@ userAuthenticate =  async function (req, callback) {
             user : {
                 player_id   : user[0].PLAYER_ID,
                 role        : user_role,
+                firstName  : user[0].FIRST_NAME,
+                lastName   : user[0].LAST_NAME,
                 token       : token
             },
             auth_message : "Success"   
