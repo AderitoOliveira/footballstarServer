@@ -145,8 +145,26 @@ insertVideoInfoToDatabase = function(req, callback) {
 }
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-fetchVideosOfExerciseLevel = function(req, callback) {
+/* fetchVideosOfExerciseLevel = function(req, callback) {
     con.query('select * from exercises_videos where EXERCISE_LEVEL = ?', [req.params.id] , function(err, rows) {
+        if (err) {
+            throw err;
+        } else
+        callback.setHeader('Content-Type', 'application/json');
+        callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+        callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+        callback.end(JSON.stringify(rows));
+        callback = rows;
+        console.log("GET VIDEOS OF THE PLAYER");   
+
+    });
+
+} */
+
+
+//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
+fetchVideosOfExerciseLevel = function(req, callback) {
+    con.query(' select exercises_videos.*, IFNULL(player_videos.VIDEO_UPLOADED, 0) as VIDEO_UPLOADED, IFNULL(player_videos.VIDEO_REVIEWED, 0) as VIDEO_REVIEWED from exercises_videos  LEFT join player_videos  on  player_videos.EXERCISE_ID = exercises_videos.EXERCISE_ID and player_videos.PLAYER_ID = ? where exercises_videos.EXERCISE_LEVEL = ? order by exercises_videos.EXERCISE_NUMBER', [req.query.player_id, req.query.level_id] , function(err, rows) {
         if (err) {
             throw err;
         } else

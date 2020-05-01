@@ -27,10 +27,14 @@ router.post('/insertVideoInfoToDatabase', function(req, res, next) {
 });
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-router.get('/getVideosOfExerciseLevel/:id', function(req, res, next) {
+/* router.get('/getVideosOfExerciseLevel/:id', function(req, res, next) {
+  fetchVideosOfExerciseLevel(req, res,);
+}); */
+
+//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
+router.get('/getVideosOfExerciseLevel', function(req, res, next) {
   fetchVideosOfExerciseLevel(req, res,);
 });
-
 
 router.get('/allVehicles', function(req, res, next) {
   //res.send(JSON.stringify({value: 1}));
