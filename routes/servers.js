@@ -164,19 +164,73 @@ insertVideoInfoToDatabase = function(req, callback) {
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
 fetchVideosOfExerciseLevel = function(req, callback) {
-    con.query(' select exercises_videos.*, IFNULL(player_videos.VIDEO_UPLOADED, 0) as VIDEO_UPLOADED, IFNULL(player_videos.VIDEO_REVIEWED, 0) as VIDEO_REVIEWED from exercises_videos  LEFT join player_videos  on  player_videos.EXERCISE_ID = exercises_videos.EXERCISE_ID and player_videos.PLAYER_ID = ? where exercises_videos.EXERCISE_LEVEL = ? order by exercises_videos.EXERCISE_NUMBER', [req.query.player_id, req.query.level_id] , function(err, rows) {
-        if (err) {
-            throw err;
-        } else
-        callback.setHeader('Content-Type', 'application/json');
-        callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-        callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-        callback.end(JSON.stringify(rows));
-        callback = rows;
-        console.log("GET VIDEOS OF THE PLAYER");   
+    let all_videos      = [];
+    for(let level_id = 1; level_id <= req.query.level_id; level_id ++) {
+        let videos_level    = [];
+        con.query(' select exercises_videos.*, IFNULL(player_videos.VIDEO_UPLOADED, 0) as VIDEO_UPLOADED, IFNULL(player_videos.VIDEO_REVIEWED, 0) as VIDEO_REVIEWED from exercises_videos  LEFT join player_videos  on  player_videos.EXERCISE_ID = exercises_videos.EXERCISE_ID and player_videos.PLAYER_ID = ? where exercises_videos.EXERCISE_LEVEL = ? order by exercises_videos.EXERCISE_NUMBER', [req.query.player_id, level_id] , function(err, rows) {
+            if (err) {
+                throw err;
+            } else {
+            //callback.setHeader('Content-Type', 'application/json');
+            //callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+            //callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+            //callback.end(JSON.stringify(rows));
+            
+            for(let i=0; i < rows.length; i++) {
+                let exercise_level  = rows[i].EXERCISE_LEVEL;
+                let video_name      = rows[i].VIDEO_NAME;
+                let exercise_number = rows[i].EXERCISE_NUMBER;
+                let video_uploaded  = rows[i].VIDEO_UPLOADED;
+                let video_reviewed  = rows[i].VIDEO_REVIEWED;
+                console.log("XPTO: " + rows[i]);
+          
+                let video_structure = {
+                  video_path      : 'http://localhost:3000/exercisesVideo/' + exercise_level + '/' + video_name,
+                  video_name      : video_name,
+                  exercise_level  : 1,
+                  exercise_number : exercise_number,
+                  file_loaded     : false,
+                  video_uploaded  : video_uploaded,
+                  video_reviewed  : video_reviewed
+                }
+          
+                 videos_level.push(video_structure);
+            }
 
-    });
+            let video_level_structrue = {
+                exercise_level : '#Level' + level_id,
+                videos_level : videos_level
+            }
 
+            all_videos.push(video_level_structrue);
+
+            if(level_id == req.query.level_id) {
+                callback.setHeader('Content-Type', 'application/json');
+                callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+                callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+                callback.end(JSON.stringify(all_videos));
+                //callback = all_videos;
+            }
+    
+
+            /* all_videos.push(video_level_structrue);
+            callback.setHeader('Content-Type', 'application/json');
+            callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+            callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+            callback.end(JSON.stringify(all_videos));
+            //callback = all_videos; */
+
+            console.log("GET VIDEOS OF THE PLAYER");   
+        }
+        });
+
+
+    }
+    /* callback.setHeader('Content-Type', 'application/json');
+    callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    callback.end(JSON.stringify(all_videos));
+    callback = all_videos; */
 }
 
 //GET ALL VEHICLES
