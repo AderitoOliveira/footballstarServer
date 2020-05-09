@@ -171,10 +171,6 @@ fetchVideosOfExerciseLevel = function(req, callback) {
             if (err) {
                 throw err;
             } else {
-            //callback.setHeader('Content-Type', 'application/json');
-            //callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-            //callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-            //callback.end(JSON.stringify(rows));
             
             for(let i=0; i < rows.length; i++) {
                 let exercise_level  = rows[i].EXERCISE_LEVEL;
@@ -209,16 +205,7 @@ fetchVideosOfExerciseLevel = function(req, callback) {
                 callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
                 callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
                 callback.end(JSON.stringify(all_videos));
-                //callback = all_videos;
             }
-    
-
-            /* all_videos.push(video_level_structrue);
-            callback.setHeader('Content-Type', 'application/json');
-            callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-            callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-            callback.end(JSON.stringify(all_videos));
-            //callback = all_videos; */
 
             console.log("GET VIDEOS OF THE PLAYER");   
         }
@@ -226,11 +213,7 @@ fetchVideosOfExerciseLevel = function(req, callback) {
 
 
     }
-    /* callback.setHeader('Content-Type', 'application/json');
-    callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    callback.end(JSON.stringify(all_videos));
-    callback = all_videos; */
+
 }
 
 //GET ALL VEHICLES
