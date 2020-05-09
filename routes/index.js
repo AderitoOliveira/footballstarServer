@@ -36,9 +36,13 @@ router.get('/getVideosOfExerciseLevel', function(req, res, next) {
   fetchVideosOfExerciseLevel(req, res,);
 });
 
-router.get('/allVehicles', function(req, res, next) {
+
+/********************************************************** ADMINISTRATOR FUNCTIONS ************************************************************************************************/
+
+//GET ALL VIDEOS TO REVIEW
+router.get('/videosToReview', function(req, res, next) {
   //res.send(JSON.stringify({value: 1}));
-  fetchAllVehicles(req, res,);
+  fetchAllVideosToReview(req, res,);
 });
 
 module.exports = router;

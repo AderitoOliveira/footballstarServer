@@ -163,7 +163,7 @@ insertVideoInfoToDatabase = function(req, callback) {
 
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-fetchVideosOfExerciseLevel = function(req, callback) {
+/* fetchVideosOfExerciseLevel = function(req, callback) {
     let all_videos      = [];
     for(let level_id = 1; level_id <= req.query.level_id; level_id ++) {
         let videos_level    = [];
@@ -214,10 +214,86 @@ fetchVideosOfExerciseLevel = function(req, callback) {
 
     }
 
+} */
+
+returnAllVideos =  function(exercise_level, player_id, all_videos)  {
+	
+	return new Promise(async function(resolve, reject) {
+    console.log("INSIDE returnAllVideos");
+		try {
+		
+			for(let level_id = 1; level_id <= exercise_level; level_id ++) {
+				let videos_level    = [];
+				con.query(' select exercises_videos.*, IFNULL(player_videos.VIDEO_UPLOADED, 0) as VIDEO_UPLOADED, IFNULL(player_videos.VIDEO_REVIEWED, 0) as VIDEO_REVIEWED from exercises_videos  LEFT join player_videos  on  player_videos.EXERCISE_ID = exercises_videos.EXERCISE_ID and player_videos.PLAYER_ID = ? where exercises_videos.EXERCISE_LEVEL = ? order by exercises_videos.EXERCISE_NUMBER', [player_id, level_id] , function(err, rows) {
+					if (err) {
+						throw err;
+					} else {
+					
+					for(let i=0; i < rows.length; i++) {
+						let exercise_level  = rows[i].EXERCISE_LEVEL;
+						let video_name      = rows[i].VIDEO_NAME;
+                        let exercise_number = rows[i].EXERCISE_NUMBER;
+                        let exercise_id     = rows[i].EXERCISE_ID;
+						let video_uploaded  = rows[i].VIDEO_UPLOADED;
+						let video_reviewed  = rows[i].VIDEO_REVIEWED;
+				
+						let video_structure = {
+						video_path      : 'http://localhost:3000/exercisesVideo/' + exercise_level + '/' + video_name,
+						video_name      : video_name,
+						exercise_level  : exercise_level,
+                        exercise_number : exercise_number,
+                        exercise_id     : exercise_id,
+						file_loaded     : false,
+						video_uploaded  : video_uploaded,
+						video_reviewed  : video_reviewed
+						}
+				
+						videos_level.push(video_structure);
+					}
+
+					let video_level_structrue = {
+						exercise_level : '#Level' + level_id,
+						videos_level : videos_level
+					}
+
+					all_videos.push(video_level_structrue);
+
+                    if(level_id == exercise_level) {
+                        resolve(all_videos);
+                    }
+
+					console.log("GET EXERCISE VIDEOS");   
+				}
+				});
+
+			}
+
+		} catch (err) {
+		console.log('Error occurred', err);
+		reject(err);
+        } 
+	});
+	
+};
+
+//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
+fetchVideosOfExerciseLevel = async function(req, callback) {
+    let all_videos      = [];
+
+    const a = await returnAllVideos(req.query.level_id, req.query.player_id, all_videos);
+
+    callback.setHeader('Content-Type', 'application/json');
+    callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    callback.end(JSON.stringify(all_videos));
+
 }
 
-//GET ALL VEHICLES
-fetchAllVehicles = function(data, callback) {
+
+/********************************************************** ADMINISTRATOR FUNCTIONS ************************************************************************************************/
+
+//GET ALL VIDEOS TO REVIEW
+fetchAllVideosToReview = function(data, callback) {
     con.query('SELECT * FROM VEHICLES', function(err, rows) {
         if (err) {
             throw err;
