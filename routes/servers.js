@@ -144,79 +144,7 @@ insertVideoInfoToDatabase = function(req, callback) {
 
 }
 
-//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-/* fetchVideosOfExerciseLevel = function(req, callback) {
-    con.query('select * from exercises_videos where EXERCISE_LEVEL = ?', [req.params.id] , function(err, rows) {
-        if (err) {
-            throw err;
-        } else
-        callback.setHeader('Content-Type', 'application/json');
-        callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-        callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-        callback.end(JSON.stringify(rows));
-        callback = rows;
-        console.log("GET VIDEOS OF THE PLAYER");   
-
-    });
-
-} */
-
-
-//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-/* fetchVideosOfExerciseLevel = function(req, callback) {
-    let all_videos      = [];
-    for(let level_id = 1; level_id <= req.query.level_id; level_id ++) {
-        let videos_level    = [];
-        con.query(' select exercises_videos.*, IFNULL(player_videos.VIDEO_UPLOADED, 0) as VIDEO_UPLOADED, IFNULL(player_videos.VIDEO_REVIEWED, 0) as VIDEO_REVIEWED from exercises_videos  LEFT join player_videos  on  player_videos.EXERCISE_ID = exercises_videos.EXERCISE_ID and player_videos.PLAYER_ID = ? where exercises_videos.EXERCISE_LEVEL = ? order by exercises_videos.EXERCISE_NUMBER', [req.query.player_id, level_id] , function(err, rows) {
-            if (err) {
-                throw err;
-            } else {
-            
-            for(let i=0; i < rows.length; i++) {
-                let exercise_level  = rows[i].EXERCISE_LEVEL;
-                let video_name      = rows[i].VIDEO_NAME;
-                let exercise_number = rows[i].EXERCISE_NUMBER;
-                let video_uploaded  = rows[i].VIDEO_UPLOADED;
-                let video_reviewed  = rows[i].VIDEO_REVIEWED;
-                console.log("XPTO: " + rows[i]);
-          
-                let video_structure = {
-                  video_path      : 'http://localhost:3000/exercisesVideo/' + exercise_level + '/' + video_name,
-                  video_name      : video_name,
-                  exercise_level  : 1,
-                  exercise_number : exercise_number,
-                  file_loaded     : false,
-                  video_uploaded  : video_uploaded,
-                  video_reviewed  : video_reviewed
-                }
-          
-                 videos_level.push(video_structure);
-            }
-
-            let video_level_structrue = {
-                exercise_level : '#Level' + level_id,
-                videos_level : videos_level
-            }
-
-            all_videos.push(video_level_structrue);
-
-            if(level_id == req.query.level_id) {
-                callback.setHeader('Content-Type', 'application/json');
-                callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-                callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-                callback.end(JSON.stringify(all_videos));
-            }
-
-            console.log("GET VIDEOS OF THE PLAYER");   
-        }
-        });
-
-
-    }
-
-} */
-
-returnAllVideos =  function(exercise_level, player_id, all_videos)  {
+returnAllExerciseVideos =  function(exercise_level, player_id, all_videos)  {
 	
 	return new Promise(async function(resolve, reject) {
     console.log("INSIDE returnAllVideos");
@@ -280,7 +208,7 @@ returnAllVideos =  function(exercise_level, player_id, all_videos)  {
 fetchVideosOfExerciseLevel = async function(req, callback) {
     let all_videos      = [];
 
-    const a = await returnAllVideos(req.query.level_id, req.query.player_id, all_videos);
+    const a = await returnAllExerciseVideos(req.query.level_id, req.query.player_id, all_videos);
 
     callback.setHeader('Content-Type', 'application/json');
     callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
@@ -292,9 +220,68 @@ fetchVideosOfExerciseLevel = async function(req, callback) {
 
 /********************************************************** ADMINISTRATOR FUNCTIONS ************************************************************************************************/
 
-//GET ALL VIDEOS TO REVIEW
-fetchAllVideosToReview = function(data, callback) {
-    con.query('SELECT * FROM VEHICLES', function(err, rows) {
+//GET ALL EXERCISE LEVELS
+fetchAllExerciseLevels = function()  {
+	
+	return new Promise(async function(resolve, reject) {
+    console.log("INSIDE fetchAllExerciseLevels");
+		try {
+                let videos_level    = [];
+                let videosToReview = await fetchNumberOfVideosToReviewByLevel(10);
+				    con.query('select VALUE from general_configurations where NAME = \'NUMBER_OF_EXERCISE_LEVELS\'', function(err, rows) {
+					if (err) {
+						throw err;
+					} else {
+					
+						for(let i=1; i <= rows[0].VALUE; i++) {
+
+                            level_array = {
+                                'Level': 'Nivel ' + i,
+                                'ExercisesToReview': 0
+                            }
+                            videos_level.push(level_array);
+
+                            //videos_level.push('Nivel '+ i);
+                            //videos_level.push({'Nivel ': i, 'VideosToReview': videosToReview});
+
+                            /* if(i == rows[0].VALUE) {
+                                resolve(videos_level);
+                            } */
+                        }
+                        
+                        for (let y=0; y < videosToReview.length; y++) {
+                            videos_level[videosToReview[y].EXERCISE_LEVEL - 1].ExercisesToReview = videosToReview[y].TOTAL_VIDEOS_TO_REVIEW
+
+                            if (y == videosToReview.length -1) {
+                                resolve(videos_level);
+                            }
+                        }
+
+					}
+				});
+
+		} catch (err) {
+		console.log('Error occurred', err);
+		reject(err);
+        } 
+	});
+};
+
+//GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
+fetchVideosOfExerciseLevel = async function(req, callback) {
+    let all_exercise_levels  = [];
+
+    all_exercise_levels = await fetchAllExerciseLevels();
+
+    callback.setHeader('Content-Type', 'application/json');
+    callback.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    callback.end(JSON.stringify(all_exercise_levels));
+
+}
+
+fecthVideosFromLevelToReview = function(req, callback) {
+    con.query('select usr.FIRST_NAME, usr.LAST_NAME, pl_videos.EXERCISE_ID, pl_videos.EXERCISE_NUMBER, pl_videos.EXERCISE_ID, pl_videos.FILE_NAME from player_videos pl_videos, users usr where pl_videos.EXERCISE_LEVEL = ? and pl_videos.VIDEO_REVIEWED = 0 and pl_videos.PLAYER_ID = usr.PLAYER_ID', req.query.exercise_level ,function(err, rows) {
         if (err) {
             throw err;
         } else
@@ -303,8 +290,30 @@ fetchAllVideosToReview = function(data, callback) {
         callback.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
         callback.end(JSON.stringify(rows));
         callback = rows;
-        console.log("GET ALL PLAYERS");   
+        console.log("Get All Videos From Level to review");   
 
     });
-
 }
+
+
+//GET NUMBER OF VIDEOS TO REVIEW BY LEVEL
+fetchNumberOfVideosToReviewByLevel = function(exerciseLevel)  {
+	
+	return new Promise(async function(resolve, reject) {
+    console.log("INSIDE fetchAllExerciseLevels");
+		try {
+				    con.query('select EXERCISE_LEVEL, count(*) as TOTAL_VIDEOS_TO_REVIEW from player_videos where VIDEO_REVIEWED = 0 group by EXERCISE_LEVEL', [exerciseLevel], function(err, rows) {
+					if (err) {
+						throw err;
+					} else {
+                        resolve(rows);
+					}
+				});
+
+		} catch (err) {
+		console.log('Error occurred', err);
+		reject(err);
+        } 
+	});
+	
+};

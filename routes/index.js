@@ -40,9 +40,15 @@ router.get('/getVideosOfExerciseLevel', function(req, res, next) {
 /********************************************************** ADMINISTRATOR FUNCTIONS ************************************************************************************************/
 
 //GET ALL VIDEOS TO REVIEW
-router.get('/videosToReview', function(req, res, next) {
+router.get('/getAllExerciseLevels', function(req, res, next) {
   //res.send(JSON.stringify({value: 1}));
-  fetchAllVideosToReview(req, res,);
+  fetchVideosOfExerciseLevel(req, res,);
+});
+
+//GET VIDEOS FROM LEVEL TO REVIEW
+router.get('/getVideosFromLevelToReview', function(req, res, next) {
+  //res.send(JSON.stringify({value: 1}));
+  fecthVideosFromLevelToReview(req, res,);
 });
 
 module.exports = router;
