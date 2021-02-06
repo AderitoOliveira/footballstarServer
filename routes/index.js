@@ -33,7 +33,7 @@ router.post('/insertVideoInfoToDatabase', function(req, res, next) {
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
 router.get('/getVideosOfExerciseLevel', function(req, res, next) {
-  fetchVideosOfExerciseLevel(req, res,);
+  fetchVideosOfExerciseLevelOfPlayer(req, res,);
 });
 
 

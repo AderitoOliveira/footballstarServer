@@ -21,7 +21,7 @@ var privateKEY = fs.readFileSync('./keys/private.key', 'utf8');
 var publicKEY = fs.readFileSync('./keys/public.key', 'utf8');
 
 const passSalt = 'Entre_Braga_E_Nova_Iorque';
-const jwtExpirySeconds = 600;
+const jwtExpirySeconds = 6000;
 
 /* Validate the user Login - Start */
 
@@ -205,7 +205,7 @@ returnAllExerciseVideos =  function(exercise_level, player_id, all_videos)  {
 };
 
 //GET ALL VIDEOS OF THE SELECTED LEVEL OF THE EXERCISES
-fetchVideosOfExerciseLevel = async function(req, callback) {
+fetchVideosOfExerciseLevelOfPlayer = async function(req, callback) {
     let all_videos      = [];
 
     const a = await returnAllExerciseVideos(req.query.level_id, req.query.player_id, all_videos);
@@ -232,7 +232,8 @@ fetchAllExerciseLevels = function()  {
 					if (err) {
 						throw err;
 					} else {
-					
+                    
+                        // Create the Levels Array initialized with 0
 						for(let i=1; i <= rows[0].VALUE; i++) {
 
                             level_array = {
@@ -240,15 +241,9 @@ fetchAllExerciseLevels = function()  {
                                 'ExercisesToReview': 0
                             }
                             videos_level.push(level_array);
-
-                            //videos_level.push('Nivel '+ i);
-                            //videos_level.push({'Nivel ': i, 'VideosToReview': videosToReview});
-
-                            /* if(i == rows[0].VALUE) {
-                                resolve(videos_level);
-                            } */
                         }
                         
+                        // Iterate over the array that has the videos to review count and assigend to the Levels Array that was initialized above
                         for (let y=0; y < videosToReview.length; y++) {
                             videos_level[videosToReview[y].EXERCISE_LEVEL - 1].ExercisesToReview = videosToReview[y].TOTAL_VIDEOS_TO_REVIEW
 
